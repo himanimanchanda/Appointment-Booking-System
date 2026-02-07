@@ -1,5 +1,5 @@
 
-package com.appointment.userservice.config;
+package com.appointment.users.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // 👈 VERY IMPORTANT
+                        .requestMatchers("/auth/**").permitAll() // 
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());

@@ -1,4 +1,4 @@
-package com.appointment.userservice.entity;
+package com.appointment.users.entity;
 import jakarta.persistence.*;
 import lombok.*;
 

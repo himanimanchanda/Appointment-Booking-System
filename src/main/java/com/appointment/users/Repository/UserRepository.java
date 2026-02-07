@@ -1,6 +1,6 @@
-package com.appointment.userservice.Repository;
+package com.appointment.users.Repository;
 
-import com.appointment.userservice.entity.User;
+import com.appointment.users.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

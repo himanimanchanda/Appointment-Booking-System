@@ -1,7 +1,8 @@
-package com.appointment.userservice.Service;
-import com.appointment.userservice.dto.UserRegisterRequest;
-import com.appointment.userservice.entity.User;
-import com.appointment.userservice.Repository.UserRepository;
+package com.appointment.users.Service;
+import com.appointment.users.dto.UserRegisterRequest;
+import com.appointment.users.entity.Role;
+import com.appointment.users.entity.User;
+import com.appointment.users.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,21 @@ public class UserService {
 //        if(!password.equals(userdata.getPassword())) throw new RuntimeException("Invalid Password");
         return userdata;
 
+    }
+    public User signup(UserRegisterRequest urr){
+        usp.findByEmail(urr.getEmail()).ifPresent(user ->{
+            throw new RuntimeException("Email already existed");
+        } );
+
+        User userdata=new User();
+        userdata.setName(urr.getName());
+        userdata.setEmail(urr.getEmail());
+        userdata.setPassword(urr.getPassword());
+        userdata.setRole(Role.PATIENT);
+        userdata.setPhone(urr.getPhone());
+        userdata.setActive(true);
+
+        return usp.save(userdata);
     }
 }
 

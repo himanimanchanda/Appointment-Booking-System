@@ -1,4 +1,4 @@
-package com.appointment.userservice.dto;
+package com.appointment.users.dto;
 
 public class LoginRequest {
     private String email;
