@@ -4,16 +4,20 @@ import com.appointment.users.entity.Role;
 import com.appointment.users.entity.User;
 import com.appointment.users.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
    private final UserRepository usp;
+   private final PasswordEncoder pse;
 
     public User login(String email,String password){
+        System.out.println(password);
         User userdata=usp.findByEmail(email).orElseThrow(()->new RuntimeException("Invalid Email"));
-//        if(!password.equals(userdata.getPassword())) throw new RuntimeException("Invalid Password");
+
+        if(!pse.matches(password, userdata.getPassword())) throw new RuntimeException("Invalid Password");
         return userdata;
 
     }
@@ -24,7 +28,7 @@ public class UserService {
         User userdata=new User();
         userdata.setName(urr.getName());
         userdata.setEmail(urr.getEmail());
-        userdata.setPassword(urr.getPassword());
+        userdata.setPassword(pse.encode(urr.getPassword()));
         userdata.setRole(Role.PATIENT);
         userdata.setPhone(urr.getPhone());
         userdata.setActive(true);
@@ -41,7 +45,7 @@ public class UserService {
         use.setEmail(urr.getEmail());
         use.setName(urr.getName());
         use.setRole(urr.getRole());
-        use.setPassword(urr.getPassword());
+        use.setPassword(pse.encode(urr.getPassword()));
         use.setActive(true);
         use.setPhone(urr.getPhone());
         return usp.save(use);

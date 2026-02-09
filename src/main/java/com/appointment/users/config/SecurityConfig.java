@@ -1,39 +1,47 @@
 package com.appointment.users.config;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+
+import com.appointment.users.Security.JWTAuthFilter;
 
 @Configuration
 public class SecurityConfig {
+    private final JWTAuthFilter jwtAuthFilter;
+    public SecurityConfig(JWTAuthFilter jwtAuthFilter) {
+        this.jwtAuthFilter = jwtAuthFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                //session, form login, basic auth — sab band
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-
-                        // Swagger endpoints allow
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
-//                         allow POST auth APIs
-                        .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
-                        //Auth APIs open
-                        .requestMatchers("/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/admin/onboard").permitAll()
-                        // everything else secure
-                        .anyRequest().authenticated()
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-                // for JWT apps
-                .formLogin(form -> form.disable());
+                // authorization rules
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/admin/**").authenticated()
+                        .anyRequest().permitAll()
+                )
+                // JWT filter
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
