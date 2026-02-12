@@ -30,10 +30,28 @@ public class SecurityConfig {
                 )
                 // authorization rules
                 .authorizeHttpRequests(auth -> auth
+
+                        //PUBLIC APIs
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/admin/**").authenticated()
+//                        .requestMatchers("/admin/**").authenticated()
+
+
+                        // SWAGGER
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        // ACTUATOR
+                        .requestMatchers("/actuator/**").permitAll()
+
+                        //PROTECTED
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
                         .anyRequest().permitAll()
                 )
+
                 // JWT filter
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

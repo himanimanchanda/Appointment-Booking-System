@@ -35,10 +35,11 @@ public class JWTAuthFilter  extends OncePerRequestFilter{
         String authHeader=request.getHeader("Authorization");
 //	 System.out.println(authHeader);
 
-        if(authHeader==null ||!authHeader.startsWith("Bearer ")) {
+        if(authHeader==null || !authHeader.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
+
         String token=authHeader.substring(7);
 //	System.out.println(token);
         try {
@@ -47,11 +48,7 @@ public class JWTAuthFilter  extends OncePerRequestFilter{
             String roleStr=claims.get("role",String.class);
             System.out.println("role in token--- "+roleStr);
             Role role = Role.valueOf(roleStr);
-            if(Role.ADMIN!=role) {
-                System.out.println("if condition ");
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                return;
-            }
+
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
@@ -74,8 +71,15 @@ public class JWTAuthFilter  extends OncePerRequestFilter{
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest req) {
-        String path=req.getRequestURI();
-        return path.startsWith("/auth/");
+
+        String path = req.getRequestURI();
+
+        return path.startsWith("/auth/")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/actuator");
+
+
     }
 
 }
