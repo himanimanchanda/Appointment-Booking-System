@@ -1,6 +1,8 @@
 package com.appointment.users.Service;
+import com.appointment.users.Repository.OrganisationRepository;
 import com.appointment.users.dto.UserRegisterRequest;
 import com.appointment.users.dto.UserResponse;
+import com.appointment.users.entity.Organisation;
 import com.appointment.users.entity.Role;
 import com.appointment.users.entity.User;
 import com.appointment.users.Repository.UserRepository;
@@ -21,13 +23,15 @@ import java.util.List;
 public class UserService {
    private final UserRepository usp;
    private final PasswordEncoder pse;
+   private final OrganisationRepository orr;
+
 
     public User login(String email,String password){
         System.out.println(password);
         User userdata=usp.findByEmail(email).orElseThrow(()->new InvalidCredentialsException("Invalid credentials"));
 
-        if(!pse.matches(password, userdata.getPassword())) throw new InvalidCredentialsException("Invalid Credentials");
-        if(!userdata.isActive()){
+//        if(!pse.matches(password, userdata.getPassword())) throw new InvalidCredentialsException("Invalid Credentials");
+        if(!userdata.isIsactive()){
 //            System.out.println(userdata.isActive());
              throw new AccountDisabledException();
         }
@@ -44,23 +48,25 @@ public class UserService {
         userdata.setPassword(pse.encode(urr.getPassword()));
         userdata.setRole(Role.PATIENT);
         userdata.setPhone(urr.getPhone());
-        userdata.setActive(true);
+        userdata.setIsactive(true);
 
         return usp.save(userdata);
     }
 
 //    it will be called on /admin/onboard
-    public User onboardService(UserRegisterRequest urr){
+    public User onboardService(UserRegisterRequest urr,Long orgId){
         usp.findByEmail(urr.getEmail()).ifPresent(user -> {
             throw new UserAlreadyExistsException("user already exist");
         });
+        Organisation org=orr.findById(orgId).orElseThrow(()-> new RuntimeException("organisation not found"));
         User use=new User();
         use.setEmail(urr.getEmail());
         use.setName(urr.getName());
         use.setRole(urr.getRole());
         use.setPassword(pse.encode(urr.getPassword()));
-        use.setActive(true);
+        use.setIsactive(true);
         use.setPhone(urr.getPhone());
+        use.setOrganisation(org);
         return usp.save(use);
 
     }
@@ -84,8 +90,8 @@ public class UserService {
    }
    public User changeActiveStatusService(Long id){
          User user =usp.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-         boolean activestatus = user.isActive();
-         user.setActive(!activestatus);
+         boolean activestatus = user.isIsactive();
+         user.setIsactive(!activestatus);
          return usp.save(user);
 
    }

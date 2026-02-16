@@ -5,6 +5,9 @@ import com.appointment.users.Service.UserService;
 import com.appointment.users.dto.UserRegisterRequest;
 import com.appointment.users.dto.UserResponse;
 import com.appointment.users.entity.User;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +16,22 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
     private final UserService userService;
-
+    private final JWTUtil jwt;
     public AdminController(UserService uss, JWTUtil jwt) {
         this.userService = uss;
+        this.jwt=jwt;
     }
 
     @PostMapping("/onboard")
-    public UserResponse onboard(@RequestBody UserRegisterRequest ur) {
-        User user = userService.onboardService(ur);
+    public UserResponse onboard(@RequestBody UserRegisterRequest ur, HttpServletRequest request) {
+        String auth= request.getHeader("authorization");
+        if(auth==null || !auth.startsWith("Bearer")) throw new RuntimeException("missing token");
+        String token=auth.substring(7);
+        Claims claims= jwt.validateToken(token);
+        Number orgIdNum = (Number) claims.get("orgId");
+        Long orgId = orgIdNum.longValue();
+        System.out.println("orgId from token: " + orgId);
+        User user = userService.onboardService(ur,orgId);
         UserResponse response = new UserResponse(user);
         return response;
     }

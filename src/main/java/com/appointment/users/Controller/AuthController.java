@@ -34,7 +34,9 @@ public class AuthController {
         String password = credentials.getPassword();
         User userdata = uss.login(email, password);
 // Generating Token Using JWTUtil class method generate token yes
-        String token=jwt.generateToken(userdata.getId(),userdata.getRole());
+        String token=jwt.generateToken(userdata.getId(),userdata.getRole(),
+//                ternary operate ,
+                userdata.getOrganisation() != null ? userdata.getOrganisation().getId() : null);
 
         UserResponse usert=new UserResponse(userdata);
         LoginResponse lr=new LoginResponse(token,usert);

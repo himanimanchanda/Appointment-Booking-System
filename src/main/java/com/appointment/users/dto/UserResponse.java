@@ -22,6 +22,6 @@ public class UserResponse {
          this.email=user.getEmail();
            this.phone= user.getPhone();
            this.role=user.getRole();
-            this.isactive=user.isActive();
+            this.isactive=user.isIsactive();
     }
 }

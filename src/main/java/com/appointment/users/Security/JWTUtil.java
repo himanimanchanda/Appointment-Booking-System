@@ -17,9 +17,9 @@ import java.util.Date;
             this.key=Keys.hmacShaKeyFor(config.getSecret().getBytes());
             this.expiration=config.getExpiration();
         }
-        public String generateToken(Long userId,Role role) {
+        public String generateToken(Long userId,Role role,Long organisationId) {
             return Jwts.builder().
-                    setSubject(userId.toString()).claim("role", role)
+                    setSubject(userId.toString()).claim("role", role).claim("orgId",organisationId)
                     .setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis()+expiration))
                     .signWith(key)
                     .compact();
