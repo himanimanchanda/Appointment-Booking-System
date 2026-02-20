@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         //PUBLIC APIs
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
 //                        .requestMatchers("/admin/**").authenticated()
 
 
@@ -47,7 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
 
                         //PROTECTED
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         .anyRequest().permitAll()
                 )

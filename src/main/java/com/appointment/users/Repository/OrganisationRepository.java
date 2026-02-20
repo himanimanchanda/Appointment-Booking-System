@@ -8,4 +8,5 @@ public interface OrganisationRepository extends JpaRepository<Organisation, Long
 
     // Optional: find by name
     Organisation findByName(String name);
+
 }

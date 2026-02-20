@@ -2,6 +2,7 @@ package com.appointment.users.Controller;
 
 import com.appointment.users.Repository.UserRepository;
 import com.appointment.users.Security.JWTUtil;
+import com.appointment.users.Service.AuthService;
 import com.appointment.users.Service.UserService;
 import com.appointment.users.dto.LoginRequest;
 import com.appointment.users.dto.LoginResponse;
@@ -14,25 +15,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("api/auth")
 public class AuthController {
     private final UserRepository usp;
     private final UserService uss;
     private final JWTUtil jwt;
-
+    private final AuthService authService;
     //Constructor of Class
-    public AuthController(UserRepository usp, UserService uss,JWTUtil jwt) {
+    public AuthController(UserRepository usp, UserService uss, JWTUtil jwt , AuthService authservice) {
         this.usp = usp;
         this.uss = uss;
         this.jwt=jwt;
+        this.authService=authservice;
     }
 
+    //    Signup Route / auth / signup
+    @PostMapping("/signup")
+    public UserResponse signup(@RequestBody UserRegisterRequest userdata) {
+       User user=authService.signup(userdata);
+       UserResponse userp=new UserResponse(user);
+       return userp;
+
+    }
     // Login Route / auth / login
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest credentials) {
         String email = credentials.getEmail();
         String password = credentials.getPassword();
-        User userdata = uss.login(email, password);
+        User userdata = authService.login(email, password);
 // Generating Token Using JWTUtil class method generate token yes
         String token=jwt.generateToken(userdata.getId(),userdata.getRole(),
 //                ternary operate ,
@@ -44,13 +54,5 @@ public class AuthController {
 
     }
 
-    //    Signup Route / auth / signup
-    @PostMapping("/signup")
-    public UserResponse signup(@RequestBody UserRegisterRequest userdata) {
-       User user=uss.signup(userdata);
-       UserResponse userp=new UserResponse(user);
-       return userp;
-
-    }
 
 }

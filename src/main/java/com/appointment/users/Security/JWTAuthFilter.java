@@ -74,12 +74,11 @@ public class JWTAuthFilter  extends OncePerRequestFilter{
 
         String path = req.getRequestURI();
 
-        return path.startsWith("/auth/")
+        return path.startsWith("/api/auth/")
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/v3/api-docs")
-                || path.startsWith("/actuator");
-
-
+                || path.startsWith("/actuator")
+                || path.startsWith("/api/user");
     }
 
 }
